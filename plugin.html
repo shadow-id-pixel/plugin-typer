@@ -14,19 +14,18 @@
         }
         body { background: var(--bg-dark); color: var(--text-light); font-family: 'Segoe UI', sans-serif; padding: 0; margin: 0; font-size: 11px; user-select: none; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
-        /* Header Gelap */
+        /* Header & Scale Box */
         .top-nav { display: flex; gap: 5px; padding: 5px; background: #333; border-bottom: 1px solid var(--border-dark); align-items: center; }
         .btn-main { background: var(--accent); color: white; border: none; padding: 8px; flex: 1; cursor: pointer; font-weight: bold; border-radius: 2px; }
         .btn-main:hover { background: #005a9e; }
         
-        /* Scale Box Lega */
-        .scale-box { display: flex; align-items: center; gap: 5px; background: #444; padding: 4px 8px; border-radius: 2px; border: 1px solid #555; min-width: 100px; }
+        .scale-box { display: flex; align-items: center; gap: 5px; background: #444; padding: 4px 8px; border-radius: 2px; border: 1px solid #555; min-width: 110px; }
         .scale-box label { font-size: 11px; color: #ccc; }
-        .scale-box input { background: transparent; border: none; color: white; width: 55px; text-align: center; font-weight: bold; outline: none; font-size: 12px; }
+        .scale-box input { background: transparent; border: none; color: white; width: 60px; text-align: center; font-weight: bold; outline: none; font-size: 13px; }
 
         textarea { width: 100%; height: 85px; background: var(--bg-darker); color: #fff; border: none; border-bottom: 1px solid var(--border-dark); padding: 10px; box-sizing: border-box; resize: none; font-family: 'Consolas', monospace; outline: none; font-size: 12px; }
         
-        /* List Area GELAP */
+        /* List Area (GELAP) */
         .list-box { flex: 1; overflow-y: auto; background: #222; color: #eee; }
         .row { display: flex; align-items: center; border-bottom: 1px solid #333; padding: 8px 12px; cursor: pointer; }
         .row:hover { background: var(--row-hover); }
@@ -35,7 +34,6 @@
         .content { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; }
         .tag { color: #ffca28; margin-right: 6px; font-weight: bold; }
 
-        /* Footer Gelap */
         .footer { background: #1a1a1a; padding: 8px 10px; font-size: 10px; color: #666; border-top: 1px solid var(--border-dark); text-align: center; }
         .footer a { color: var(--accent); text-decoration: none; }
     </style>
@@ -106,8 +104,8 @@
                 var doc = app.activeDocument;
                 
                 // Cek Seleksi
-                var selection;
-                try { selection = doc.selection.bounds; } catch(e) { selection = null; }
+                var selBounds;
+                try { selBounds = doc.selection.bounds; } catch(e) { selBounds = null; }
 
                 var layer = doc.artLayers.add();
                 layer.kind = LayerKind.TEXT;
@@ -117,21 +115,17 @@
                 ti.size = ${fontSize};
                 ti.justification = Justification.CENTER;
 
-                if (selection) {
-                    // Paksa ke Paragraph Text untuk auto-wrap
-                    ti.kind = TextType.PARAGRAPHTEXT;
-                    var w = selection[2] - selection[0];
-                    var h = selection[3] - selection[1];
+                if (selBounds) {
+                    // Gunakan teknik Point Text yang dipindahkan ke tengah seleksi
+                    // Ini jauh lebih aman daripada Paragraph Text di Photopea
+                    var centerX = (selBounds[0] + selBounds[2]) / 2;
+                    var centerY = (selBounds[1] + selBounds[3]) / 2;
                     
-                    // Pastikan ukuran tidak nol
-                    ti.width = (w > 0) ? w : 100;
-                    ti.height = (h > 0) ? h : 100;
+                    ti.position = [centerX, centerY];
                     
-                    // Posisi di titik kiri atas seleksi
-                    ti.position = [selection[0], selection[1]];
+                    // Aktifkan wrap jika teks terlalu panjang (opsional)
+                    // ti.width = selBounds[2] - selBounds[0]; 
                 } else {
-                    // Fallback ke Point Text jika tidak ada seleksi
-                    ti.kind = TextType.POINTTEXT;
                     ti.position = [doc.width / 2, doc.height / 2];
                 }
             `;
