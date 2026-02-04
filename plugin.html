@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { background: #333; color: white; font-family: sans-serif; padding: 10px; font-size: 12px; }
+        textarea { width: 100%; height: 80px; background: #222; color: #eee; border: 1px solid #555; margin-bottom: 10px; }
+        .line-item { background: #444; padding: 5px; margin-bottom: 3px; cursor: pointer; border-radius: 3px; border-left: 3px solid #0078d4; }
+        .line-item:hover { background: #555; }
+        .label { font-weight: bold; color: #ffca28; margin-right: 5px; }
+    </style>
+</head>
+<body>
+    <strong>Script Input:</strong>
+    <textarea id="scriptInput" oninput="updateList()" placeholder="Paste script di sini..."></textarea>
+    
+    <div id="lineList"></div>
+
+    <script>
+        function updateList() {
+            const input = document.getElementById("scriptInput").value;
+            const lines = input.split('\n');
+            const listDiv = document.getElementById("lineList");
+            listDiv.innerHTML = "";
+
+            lines.forEach((line) => {
+                if (line.trim() === "") return;
+                
+                let div = document.createElement("div");
+                div.className = "line-item";
+                div.innerText = line;
+                div.onclick = () => sendToPhotopea(line);
+                listDiv.appendChild(div);
+            });
+        }
+
+        function sendToPhotopea(text) {
+            // Logika sederhana: hapus kode seperti (): atau OT: sebelum paste
+            let cleanText = text.replace(/^[A-Z()]+:/, "").trim();
+            
+            const script = `
+                var doc = app.activeDocument;
+                var layer = doc.artLayers.add();
+                layer.kind = LayerKind.TEXT;
+                var textItem = layer.textItem;
+                textItem.contents = "${cleanText}";
+                textItem.size = 30;
+                // Kamu bisa tambah perintah font di sini, misal:
+                // textItem.font = "ArialMT"; 
+            `;
+            window.parent.postMessage(script, "*");
+        }
+    </script>
+</body>
+</html>
