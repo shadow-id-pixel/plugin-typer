@@ -6,50 +6,43 @@
         :root { 
             --bg-dark: #282828; --bg-darker: #1a1a1a; --accent: #0078d4;
             --text-light: #eee; --border-dark: #444; --row-hover: #333;
-            --row-active: #094771; --footer-bg: #ffffff; --footer-text: #333;
+            --row-active: #094771;
         }
         body { background: var(--bg-dark); color: var(--text-light); font-family: 'Segoe UI', sans-serif; padding: 0; margin: 0; font-size: 11px; user-select: none; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
-        /* Header & Controls */
         .top-nav { display: flex; gap: 4px; padding: 5px; background: #333; border-bottom: 1px solid var(--border-dark); align-items: center; }
         .btn-main { background: var(--accent); color: white; border: none; padding: 8px; flex: 1; cursor: pointer; font-weight: bold; border-radius: 2px; }
         
-        .scale-section { display: flex; align-items: center; background: #444; border-radius: 2px; border: 1px solid #555; }
-        .scale-label { font-size: 10px; color: #ccc; padding: 0 5px; }
-        .scale-input { background: transparent; border: none; color: white; width: 40px; text-align: center; font-weight: bold; outline: none; padding: 4px 0; }
+        .scale-section { display: flex; align-items: center; background: #444; border-radius: 2px; border: 1px solid #555; height: 28px; }
+        .scale-label { font-size: 10px; color: #ccc; padding: 0 8px; }
+        .scale-input { background: transparent; border: none; color: white; width: 35px; text-align: center; font-weight: bold; outline: none; }
         
-        .size-btn { background: #555; border: none; color: white; padding: 4px 8px; cursor: pointer; font-size: 14px; line-height: 1; display: flex; align-items: center; border-left: 1px solid #666; }
+        .size-btn { background: #555; border: none; color: white; width: 28px; height: 100%; cursor: pointer; font-size: 16px; border-left: 1px solid #666; display: flex; justify-content: center; align-items: center; }
         .size-btn:hover { background: #666; }
 
         textarea { width: 100%; height: 80px; background: var(--bg-darker); color: #fff; border: none; border-bottom: 1px solid var(--border-dark); padding: 8px; box-sizing: border-box; resize: none; font-family: 'Consolas', monospace; outline: none; }
         .list-box { flex: 1; overflow-y: auto; background: #222; }
-        .row { display: flex; align-items: center; border-bottom: 1px solid #333; padding: 6px 10px; cursor: pointer; }
+        .row { display: flex; align-items: center; border-bottom: 1px solid #333; padding: 8px 12px; cursor: pointer; }
         .row.active { background: var(--row-active); border-left: 3px solid var(--accent); }
-        .tag { color: #ffca28; margin-right: 6px; font-weight: bold; }
+        .tag { color: #ffca28; margin-right: 8px; font-weight: bold; }
 
-        /* Settings Modal */
         #settingsModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 100; padding: 15px; box-sizing: border-box; }
-        .modal-content { background: #333; padding: 15px; border-radius: 4px; border: 1px solid #555; max-height: 95%; overflow-y: auto; }
-        .setting-item { margin-bottom: 12px; }
-        .setting-item label { display: block; color: #aaa; margin-bottom: 3px; font-size: 10px; font-weight: bold; }
-        .modal-input { background: #1a1a1a; color: #fff; border: 1px solid #555; padding: 8px; width: 100%; box-sizing: border-box; border-radius: 2px; font-size: 12px; }
+        .modal-content { background: #333; padding: 15px; border-radius: 4px; border: 1px solid #555; max-height: 95%; overflow-y: auto; color: #fff; }
+        .modal-input { background: #1a1a1a; color: #fff; border: 1px solid #555; padding: 8px; width: 100%; box-sizing: border-box; margin-top: 5px; border-radius: 2px; }
 
-        /* Footer */
-        .footer { background: var(--footer-bg); padding: 6px; font-size: 10px; color: var(--footer-text); border-top: 1px solid #ccc; text-align: center; font-weight: 600; }
+        .footer { background: #1a1a1a; padding: 8px; font-size: 10px; color: #666; border-top: 1px solid var(--border-dark); text-align: center; }
     </style>
 </head>
-<body>
+<body onkeydown="handleGlobalKeys(event)">
     <div class="top-nav">
         <button class="btn-main" onclick="sendText()">+ Paste & Next</button>
-        
         <div class="scale-section">
-            <span class="scale-label">scale:</span>
+            <span class="scale-label">font size:</span>
             <input type="number" id="scaleInput" class="scale-input" value="100">
-            <span style="color:#ccc; padding-right:5px;">%</span>
-            <button class="size-btn" onclick="adjustScale(0.8)">×</button>
-            <button class="size-btn" onclick="adjustScale(1.2)">+</button>
+            <span style="color:#ccc; padding-right:8px;">%</span>
+            <button class="size-btn" onclick="adjustScale(0.9)" title="Decrease Size (*)">*</button>
+            <button class="size-btn" onclick="adjustScale(1.1)" title="Increase Size (+)">+</button>
         </div>
-
         <button onclick="toggleSettings()" style="background:#444; border:none; color:white; padding:8px 12px; cursor:pointer; border-radius:2px;">⚙</button>
     </div>
 
@@ -58,45 +51,50 @@
 
     <div id="settingsModal">
         <div class="modal-content">
-            <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center;">
-                <strong style="color:var(--accent); font-size:14px;">Settings</strong>
-                <button onclick="toggleSettings()" style="background:#f44; border:none; color:white; padding:4px 10px; cursor:pointer; border-radius:2px;">✕ Close</button>
+            <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                <strong>Settings</strong>
+                <button onclick="toggleSettings()" style="color:#f44; border:none; background:none; cursor:pointer;">✕ Close</button>
             </div>
-            
-            <div class="setting-item">
-                <label>Shortcut: Paste</label>
-                <input type="text" class="modal-input" value="WIN + CTRL" readonly>
-            </div>
-            <div class="setting-item">
-                <label>Shortcut: Next line</label>
-                <input type="text" class="modal-input" value="CTRL + ENTER" readonly>
-            </div>
-            <div class="setting-item">
-                <label>Tags for ignoring the lines</label>
-                <textarea id="ignoreTags" class="modal-input" style="height:150px;" oninput="saveSettings()"></textarea>
-            </div>
+            <label style="font-size:10px; color:#aaa;">Tags for ignoring the lines</label>
+            <textarea id="ignoreTags" class="modal-input" style="height:150px;" oninput="saveSettings()"></textarea>
         </div>
     </div>
 
     <div class="footer">
-        typer for photopea ( inspired by <a href="https://typer.hayasaku.fr" target="_blank" style="color:var(--accent); text-decoration:none;">typer.hayasaku.fr</a> )
-        <div style="font-size:9px; color:#999; margin-top:1px;">v1.8 | Default Ignore Tags Build</div>
+        typer for photopea | v2.1 | Shortcut: + (bigger), * (smaller)
     </div>
 
     <script>
         let selectedIndex = -1;
-        let linesData = [];
-        const DEFAULT_TAGS = "SFX:\nSfx:\nsfx:\nSFX\nSfx\nsfx\n##\nHalaman\n________________________________________\nPage\n---\npage\n— Page\n===\nP1\nP2\nP3\nP4\nP5\nP6\nP7\nP8\nP9\nP10\n[1]\n[2]\n[3]\n[4]\n[5]\n[6]\n[7]\n[8]\n[9]\n[10]\nPg.\nPAGE\n=0\n--";
-
-        function toggleSettings() {
-            const modal = document.getElementById('settingsModal');
-            modal.style.display = (modal.style.display === 'block') ? 'none' : 'block';
-        }
+        let filteredLines = [];
+        const DEFAULT_TAGS = "SFX:\nSfx:\nsfx:\nSFX\nSfx\nsfx\n##\nHalaman\nPage\n---\npage\n===\nP1\nP2\n[1]\nPg.\nPAGE\n=0\n--";
 
         function adjustScale(factor) {
             const input = document.getElementById('scaleInput');
-            let current = parseFloat(input.value) || 100;
-            input.value = Math.round(current * factor);
+            input.value = Math.round((parseFloat(input.value) || 100) * factor);
+        }
+
+        function handleGlobalKeys(e) {
+            // Numpad Plus (+) untuk memperbesar font di plugin
+            if (e.key === "+") { 
+                e.preventDefault(); 
+                adjustScale(1.1); 
+            }
+            // Numpad Asterisk (*) untuk memperkecil font di plugin
+            if (e.key === "*") { 
+                e.preventDefault(); 
+                adjustScale(0.9); 
+            }
+            // Ctrl + Enter untuk navigasi baris
+            if (e.ctrlKey && e.key === "Enter") { 
+                e.preventDefault(); 
+                selectRow(selectedIndex + 1); 
+            }
+        }
+
+        function toggleSettings() {
+            const m = document.getElementById('settingsModal');
+            m.style.display = m.style.display === 'block' ? 'none' : 'block';
         }
 
         function saveSettings() {
@@ -106,35 +104,34 @@
 
         function renderLines() {
             const val = document.getElementById('input').value;
-            const ignoreVal = document.getElementById('ignoreTags').value;
-            const ignoreList = ignoreVal.split('\n').map(t => t.trim()).filter(t => t !== "");
-            
+            const ignoreList = (document.getElementById('ignoreTags').value || "").split('\n').map(t => t.trim()).filter(t => t !== "");
             const rawLines = val.split('\n');
             const list = document.getElementById('list');
             list.innerHTML = '';
-            linesData = [];
+            filteredLines = [];
 
             rawLines.forEach((line) => {
                 if(!line.trim()) return;
-                const shouldIgnore = ignoreList.some(tag => line.trim().startsWith(tag));
-                if(shouldIgnore) return;
+                if(ignoreList.some(tag => line.trim().startsWith(tag))) return;
 
-                linesData.push(line);
+                filteredLines.push(line);
+                let idx = filteredLines.length - 1;
                 let div = document.createElement('div');
                 div.className = 'row';
-                div.id = 'row-' + (linesData.length - 1);
+                div.id = 'row-' + idx;
                 
                 let match = line.match(/^([A-Z()]+):(.*)/);
                 let tag = match ? match[1] + ":" : "";
                 let txt = match ? match[2] : line;
 
-                div.innerHTML = `<span style="color:#666; width:30px; font-size:10px;">${linesData.length}</span><span style="flex:1;"><span class="tag">${tag}</span>${txt}</span>`;
-                div.onclick = () => selectRow(linesData.length - 1);
+                div.innerHTML = `<span style="color:#666; width:30px;">${idx + 1}</span><span style="flex:1;"><span class="tag">${tag}</span>${txt}</span>`;
+                div.onclick = () => selectRow(idx);
                 list.appendChild(div);
             });
         }
 
         function selectRow(index) {
+            if (index < 0 || index >= filteredLines.length) return;
             selectedIndex = index;
             document.querySelectorAll('.row').forEach(r => r.classList.remove('active'));
             const activeRow = document.getElementById('row-' + index);
@@ -145,47 +142,37 @@
         }
 
         function sendText() {
-            if(selectedIndex === -1 || !linesData[selectedIndex]) return;
-            const scaleVal = parseFloat(document.getElementById('scaleInput').value) || 100;
-            const fontSize = 25 * (scaleVal / 100);
-            let line = linesData[selectedIndex];
+            if(selectedIndex === -1 || !filteredLines[selectedIndex]) return;
+            const scale = (parseFloat(document.getElementById('scaleInput').value) || 100) / 100;
+            let line = filteredLines[selectedIndex];
             let match = line.match(/^([A-Z()]+):(.*)/);
-            let rawText = match ? match[2].trim() : line.trim();
+            let text = match ? match[2].trim() : line.trim();
 
-            let words = rawText.split(' ');
-            let shapedText = "";
-            for (let i = 0; i < words.length; i++) {
-                shapedText += words[i] + " ";
-                if ((i + 1) % 3 === 0 && i !== words.length - 1) shapedText += "\\r";
+            let w = text.split(' '), s = "";
+            for (let i = 0; i < w.length; i++) {
+                s += w[i] + " ";
+                if ((i + 1) % 3 === 0 && i !== w.length - 1) s += "\\r";
             }
 
-            const ppeaScript = `
+            const ppea = `
                 var doc = app.activeDocument;
                 var sel; try { sel = doc.selection.bounds; } catch(e) { sel = null; }
                 var layer = doc.artLayers.add();
                 layer.kind = LayerKind.TEXT;
                 var ti = layer.textItem;
-                ti.contents = "${shapedText.trim().replace(/"/g, '\\"')}";
-                ti.size = ${fontSize};
+                ti.contents = "${s.trim().replace(/"/g, '\\"')}";
+                ti.size = ${25 * scale};
                 ti.justification = Justification.CENTER;
-                if (sel) {
-                    ti.position = [(sel[0] + sel[2]) / 2, (sel[1] + sel[3]) / 2];
-                } else {
-                    ti.position = [doc.width / 2, doc.height / 2];
-                }
+                if (sel) { ti.position = [(sel[0] + sel[2]) / 2, (sel[1] + sel[3]) / 2]; }
+                else { ti.position = [doc.width / 2, doc.height / 2]; }
             `;
-            window.parent.postMessage(ppeaScript, "*");
-            if (selectedIndex < linesData.length - 1) selectRow(selectedIndex + 1);
+            window.parent.postMessage(ppea, "*");
+            selectRow(selectedIndex + 1);
         }
 
         window.onload = () => {
             let saved = localStorage.getItem('ignoreTags');
-            if (saved === null) {
-                document.getElementById('ignoreTags').value = DEFAULT_TAGS;
-                localStorage.setItem('ignoreTags', DEFAULT_TAGS);
-            } else {
-                document.getElementById('ignoreTags').value = saved;
-            }
+            document.getElementById('ignoreTags').value = (saved === null) ? DEFAULT_TAGS : saved;
             renderLines();
         }
     </script>
