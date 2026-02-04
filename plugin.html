@@ -2,98 +2,102 @@
 <html>
 <head>
     <style>
-        body { background: #333; color: white; font-family: 'Segoe UI', sans-serif; padding: 10px; margin: 0; font-size: 13px; }
-        .header { display: flex; gap: 5px; margin-bottom: 10px; }
-        button { background: #0078d4; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 2px; flex-grow: 1; }
-        button:hover { background: #005a9e; }
+        :root { --bg: #282828; --accent: #0078d4; --text: #eee; --border: #444; }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; padding: 0; margin: 0; font-size: 11px; user-select: none; }
         
-        textarea { width: 100%; height: 80px; background: #222; color: #eee; border: 1px solid #555; box-sizing: border-box; padding: 5px; font-family: monospace; }
-        
-        .list-container { border: 1px solid #555; height: 200px; overflow-y: auto; margin-top: 10px; background: #282828; }
-        .line-item { padding: 8px; border-bottom: 1px solid #3c3c3c; cursor: pointer; display: flex; gap: 10px; align-items: center; }
-        .line-item:hover { background: #3d3d3d; }
-        .line-num { color: #888; font-size: 11px; min-width: 20px; }
-        .line-content { flex-grow: 1; }
-        .line-tag { color: #ffca28; font-weight: bold; }
+        /* Header & Buttons */
+        .top-nav { display: flex; gap: 2px; padding: 5px; background: #333; }
+        .btn-main { background: var(--accent); color: white; border: none; padding: 6px; flex: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .btn-sec { background: #444; border: none; color: #ccc; padding: 6px; cursor: pointer; }
 
-        .style-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 10px; }
-        .style-btn { background: #444; text-align: left; padding: 5px 10px; font-size: 11px; border-left: 3px solid #0078d4; }
-        .style-btn:hover { background: #555; }
+        /* Script Area */
+        textarea { width: 100%; height: 60px; background: #1a1a1a; color: #fff; border: none; border-bottom: 1px solid var(--border); padding: 5px; box-sizing: border-box; resize: none; font-family: monospace; }
+        
+        /* List Lines */
+        .list-box { height: 180px; overflow-y: scroll; background: #222; }
+        .row { display: flex; align-items: center; border-bottom: 1px solid #333; padding: 4px 6px; cursor: pointer; }
+        .row:hover { background: #333; }
+        .row.active { background: #094771; }
+        .num { color: #777; width: 25px; font-size: 10px; }
+        .content { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .tag { color: #ffca28; margin-right: 4px; font-weight: bold; }
+
+        /* Font Styles Grid */
+        .style-header { background: #333; padding: 5px; font-weight: bold; border-top: 1px solid var(--border); display: flex; justify-content: space-between; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); }
+        .style-item { background: #383838; padding: 6px 8px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .style-item:hover { background: #454545; }
+        .dot { height: 6px; width: 6px; border-radius: 50%; border: 1px solid #777; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <button onclick="applyToPhotopea()">Paste</button>
-        <button style="background:#555">Align</button>
+    <div class="top-nav">
+        <button class="btn-main" onclick="sendText()">+ Paste</button>
+        <button class="btn-sec">Align</button>
+        <button class="btn-sec">⚙</button>
     </div>
 
-    <textarea id="scriptInput" oninput="parseScript()" placeholder="Masukkan skrip di sini..."></textarea>
+    <textarea id="input" oninput="renderLines()" placeholder="Paste script manhwa di sini..."></textarea>
 
-    <div class="list-container" id="lineList">
-        </div>
+    <div class="list-box" id="list"></div>
 
-    <div style="margin-top: 15px; font-weight: bold; border-bottom: 1px solid #555;">Styles</div>
-    <div class="style-grid">
-        <div class="style-btn" onclick="setStyle('Ngomong')">ngomong</div>
-        <div class="style-btn" onclick="setStyle('Berpikir')">berpikir</div>
-        <div class="style-btn" onclick="setStyle('Teriak')"><b>TERIAK</b></div>
-        <div class="style-btn" onclick="setStyle('Box')">BOX</div>
+    <div class="style-header">
+        <span>Vassalscans Font</span>
+        <span>(20)</span>
+    </div>
+    <div class="grid">
+        <div class="style-item" onclick="applyStyle('ngomong')"><span class="dot"></span> ngomong</div>
+        <div class="style-item" onclick="applyStyle('berpikir')"><span class="dot"></span> berpikir</div>
+        <div class="style-item" onclick="applyStyle('teriak')"><span class="dot" style="background:#fff"></span> <b>TERIAK</b></div>
+        <div class="style-item" onclick="applyStyle('box')"><span class="dot" style="background:#ffca28"></span> BOX</div>
     </div>
 
     <script>
         let selectedText = "";
 
-        function parseScript() {
-            const input = document.getElementById("scriptInput").value;
-            const lines = input.split('\n');
-            const listDiv = document.getElementById("lineList");
-            listDiv.innerHTML = "";
+        function renderLines() {
+            const val = document.getElementById('input').value;
+            const lines = val.split('\n');
+            const list = document.getElementById('list');
+            list.innerHTML = '';
 
-            lines.forEach((line, index) => {
-                if (line.trim() === "") return;
+            lines.forEach((line, i) => {
+                if(!line.trim()) return;
+                let div = document.createElement('div');
+                div.className = 'row';
                 
-                let div = document.createElement("div");
-                div.className = "line-item";
-                
-                // Deteksi tag seperti (): atau OT:
                 let match = line.match(/^([A-Z()]+):(.*)/);
                 let tag = match ? match[1] + ":" : "";
-                let content = match ? match[2] : line;
+                let txt = match ? match[2] : line;
 
-                div.innerHTML = `<span class="line-num">${index + 26}</span>
-                                 <span class="line-content"><span class="line-tag">${tag}</span>${content}</span>`;
-                
+                div.innerHTML = `<span class="num">${i + 26}</span><span class="content"><span class="tag">${tag}</span>${txt}</span>`;
                 div.onclick = () => {
-                    // Highlight pilihan
-                    document.querySelectorAll('.line-item').forEach(el => el.style.background = "");
-                    div.style.background = "#004a82";
-                    selectedText = content.trim();
+                    document.querySelectorAll('.row').forEach(r => r.classList.remove('active'));
+                    div.classList.add('active');
+                    selectedText = txt.trim();
                 };
-                listDiv.appendChild(div);
+                list.appendChild(div);
             });
         }
 
-        function applyToPhotopea() {
-            if (!selectedText) {
-                alert("Pilih baris teks dulu!");
-                return;
-            }
-
-            const script = `
+        function sendText() {
+            if(!selectedText) return;
+            // Script untuk Photopea
+            const ppeaScript = `
                 var doc = app.activeDocument;
                 var layer = doc.artLayers.add();
                 layer.kind = LayerKind.TEXT;
-                var textItem = layer.textItem;
-                textItem.contents = "${selectedText.replace(/"/g, '\\"')}";
-                textItem.size = 25;
-                textItem.justification = Justification.CENTER;
+                var ti = layer.textItem;
+                ti.contents = "${selectedText.replace(/"/g, '\\"')}";
+                ti.size = 24;
+                ti.justification = Justification.CENTER;
             `;
-            window.parent.postMessage(script, "*");
+            window.parent.postMessage(ppeaScript, "*");
         }
 
-        function setStyle(styleName) {
-            // Logika untuk mengubah font sesuai style bisa ditambahkan di sini
-            console.log("Style set to: " + styleName);
+        function applyStyle(type) {
+            // Placeholder untuk fungsi ganti font secara otomatis
+            alert("Style " + type + " dipilih. Kamu bisa setting font spesifik di kode script Photopea.");
         }
     </script>
 </body>
