@@ -11,8 +11,8 @@
             --border-dark: #444;
             --row-hover: #333;
             --row-active: #094771;
-            /* Footer Terang */
-            --footer-bg: #f5f5f5;
+            /* Footer Terang agar terbaca */
+            --footer-bg: #ffffff;
             --footer-text: #333;
         }
         body { background: var(--bg-dark); color: var(--text-light); font-family: 'Segoe UI', sans-serif; padding: 0; margin: 0; font-size: 11px; user-select: none; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
@@ -27,7 +27,7 @@
 
         textarea { width: 100%; height: 85px; background: var(--bg-darker); color: #fff; border: none; border-bottom: 1px solid var(--border-dark); padding: 10px; box-sizing: border-box; resize: none; font-family: 'Consolas', monospace; outline: none; font-size: 12px; }
         
-        .list-box { flex: 1; overflow-y: auto; background: #222; color: #eee; }
+        .list-box { flex: 1; overflow-y: auto; background: #222; }
         .row { display: flex; align-items: center; border-bottom: 1px solid #333; padding: 8px 12px; cursor: pointer; }
         .row:hover { background: var(--row-hover); }
         .row.active { background: var(--row-active); border-left: 4px solid var(--accent); }
@@ -35,10 +35,10 @@
         .content { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; }
         .tag { color: #ffca28; margin-right: 6px; font-weight: bold; }
 
-        /* Footer Terang Sesuai Permintaan */
-        .footer { background: var(--footer-bg); padding: 8px 10px; font-size: 10px; color: var(--footer-text); border-top: 1px solid #ccc; text-align: center; font-weight: 500; }
-        .footer a { color: var(--accent); text-decoration: none; font-weight: bold; }
-        .version { font-size: 9px; color: #888; margin-top: 2px; }
+        /* Footer Terang */
+        .footer { background: var(--footer-bg); padding: 8px 10px; font-size: 10px; color: var(--footer-text); border-top: 1px solid #ccc; text-align: center; font-weight: 600; }
+        .footer a { color: var(--accent); text-decoration: none; }
+        .version { font-size: 9px; color: #999; margin-top: 2px; }
     </style>
 </head>
 <body>
@@ -58,7 +58,7 @@
 
     <div class="footer">
         typer for photopea ( inspired by <a href="https://typer.hayasaku.fr" target="_blank">typer.hayasaku.fr</a> )
-        <div class="version">v1.3 | Stable Wrap Build</div>
+        <div class="version">v1.4 | Final Wrap Fix</div>
     </div>
 
     <script>
@@ -113,24 +113,23 @@
                 layer.kind = LayerKind.TEXT;
                 var ti = layer.textItem;
                 
-                // Langkah 1: Set sebagai Point Text dulu agar teks pasti muncul
-                ti.kind = TextType.POINTTEXT;
-                ti.contents = "${cleanText.replace(/"/g, '\\"').replace(/\n/g, '\\r')}";
+                // Set parameter dasar
                 ti.size = ${fontSize};
                 ti.justification = Justification.CENTER;
 
                 if (selection) {
-                    // Langkah 2: Baru ubah ke Paragraph Text setelah teks ada
-                    var w = selection[2] - selection[0];
-                    var h = selection[3] - selection[1];
-                    
+                    // Tentukan area dulu sebelum isi teks dimasukkan
                     ti.kind = TextType.PARAGRAPHTEXT;
-                    ti.width = w;
-                    ti.height = h;
+                    ti.width = selection[2] - selection[0];
+                    ti.height = selection[3] - selection[1];
                     ti.position = [selection[0], selection[1]];
                 } else {
+                    ti.kind = TextType.POINTTEXT;
                     ti.position = [doc.width / 2, doc.height / 2];
                 }
+
+                // Isi teks di paling akhir agar merespon dimensi kotak
+                ti.contents = "${cleanText.replace(/"/g, '\\"').replace(/\n/g, '\\r')}";
             `;
             window.parent.postMessage(ppeaScript, "*");
 
