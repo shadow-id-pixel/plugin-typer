@@ -6,11 +6,12 @@
         :root { 
             --bg-dark: #282828; --bg-darker: #1a1a1a; --accent: #0078d4;
             --text-light: #eee; --border-dark: #444; --row-hover: #333;
-            --row-active: #094771; --footer-bg: #f5f5f5; --footer-text: #333;
+            --row-active: #094771;
+            /* Footer Terang Sesuai Permintaan */
+            --footer-bg: #f5f5f5; --footer-text: #333;
         }
         body { background: var(--bg-dark); color: var(--text-light); font-family: 'Segoe UI', sans-serif; padding: 0; margin: 0; font-size: 11px; user-select: none; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
-        /* Header */
         .top-nav { display: flex; gap: 4px; padding: 5px; background: #333; border-bottom: 1px solid var(--border-dark); align-items: center; }
         .btn-main { background: var(--accent); color: white; border: none; padding: 8px; flex: 1; cursor: pointer; font-weight: bold; border-radius: 2px; }
         
@@ -20,30 +21,25 @@
 
         textarea#input { width: 100%; height: 80px; background: var(--bg-darker); color: #fff; border: none; border-bottom: 1px solid var(--border-dark); padding: 8px; box-sizing: border-box; resize: none; font-family: 'Consolas', monospace; outline: none; }
         
-        /* List & Style Layout */
         .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         .list-box { flex: 2; overflow-y: auto; background: #222; border-bottom: 2px solid #444; }
         
-        /* Style Grid di Bawah */
         .style-grid { flex: 1.5; overflow-y: auto; background: #333; padding: 5px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
-        .style-item { display: flex; align-items: center; background: #444; padding: 6px; border-radius: 2px; cursor: pointer; border: 1px solid #555; position: relative; }
+        .style-item { display: flex; align-items: center; background: #444; padding: 6px; border-radius: 2px; cursor: pointer; border: 1px solid #555; }
         .style-item.active { background: var(--row-active); border-color: var(--accent); }
         .style-name { flex: 1; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .edit-icon { color: #aaa; cursor: pointer; padding: 2px 5px; font-size: 12px; }
-        .edit-icon:hover { color: white; }
 
         .row { display: flex; align-items: center; border-bottom: 1px solid #333; padding: 8px 12px; cursor: pointer; }
         .row.active { background: var(--row-active); border-left: 3px solid var(--accent); }
         .tag-pill { background: #FFF3B0; color: #333; padding: 0 4px; border-radius: 2px; margin-right: 6px; font-weight: bold; font-size: 9px; }
 
-        /* Modal */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 200; padding: 20px; box-sizing: border-box; }
         .modal-content { background: #333; padding: 15px; border-radius: 4px; border: 1px solid #555; max-height: 95%; overflow-y: auto; color: #fff; }
-        .modal-input { background: #1a1a1a; color: #fff; border: 1px solid #555; padding: 8px; width: 100%; box-sizing: border-box; margin-top: 5px; border-radius: 2px; margin-bottom: 10px; }
-        .modal-btn { background: var(--accent); color: white; border: none; padding: 10px; cursor: pointer; border-radius: 2px; width: 100%; margin-top: 10px; font-weight: bold; }
+        .modal-input, .modal-select { background: #1a1a1a; color: #fff; border: 1px solid #555; padding: 8px; width: 100%; box-sizing: border-box; margin-top: 5px; border-radius: 2px; margin-bottom: 10px; font-size: 12px; }
 
-        /* Footer */
         .footer { background: var(--footer-bg); padding: 8px; font-size: 10px; color: var(--footer-text); border-top: 1px solid #ccc; text-align: center; font-weight: 500; }
+        .footer a { color: var(--accent); text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body onkeydown="handleGlobalKeys(event)">
@@ -54,8 +50,8 @@
             <input type="number" id="scaleInput" class="scale-input" value="100" oninput="saveData()">
             <span style="color:#ccc;">%</span>
         </div>
-        <button onclick="openAddStyle()" style="background:#444; border:none; color:white; padding:8px; cursor:pointer;">➕</button>
-        <button onclick="toggleModal('settingsModal')" style="background:#444; border:none; color:white; padding:8px; cursor:pointer;">⚙</button>
+        <button onclick="openAddStyle()" style="background:#444; border:none; color:white; padding:8px; cursor:pointer; border-radius:2px;">➕</button>
+        <button onclick="toggleModal('settingsModal')" style="background:#444; border:none; color:white; padding:8px; cursor:pointer; border-radius:2px;">⚙</button>
     </div>
 
     <textarea id="input" oninput="handleInput()" placeholder="Paste script manhwa di sini..."></textarea>
@@ -74,14 +70,23 @@
             <input type="hidden" id="editStyleId">
             <label>Style Name</label>
             <input type="text" id="sName" class="modal-input">
+            
             <label>Font Family</label>
-            <input type="text" id="sFont" class="modal-input" placeholder="e.g. CCVictorySpeech-Regular">
+            <select id="sFont" class="modal-select">
+                <option value="CCVictorySpeech-Regular">CCVictorySpeech-Regular</option>
+                <option value="CCVictorySpeech-Italic">CCVictorySpeech-Italic</option>
+                <option value="WildWords-Regular">WildWords-Regular</option>
+                <option value="AnimeAce2.0BB-Regular">AnimeAce2.0BB-Regular</option>
+                <option value="Arial">Arial</option>
+            </select>
+            <div style="font-size:9px; color:#aaa; margin-top:-5px; margin-bottom:10px;">*Pastikan font sudah ter-load di Photopea</div>
+
             <label>Base Size (px)</label>
             <input type="number" id="sSize" class="modal-input">
             <label>Prefixes (comma separated)</label>
             <input type="text" id="sPrefix" class="modal-input" placeholder='"": , ():'>
-            <button class="modal-btn" onclick="saveStyle()">Save Style</button>
-            <button class="modal-btn" style="background:#f44; margin-top:5px;" id="btnDelStyle" onclick="deleteStyle()">Delete Style</button>
+            <button style="background:var(--accent); color:white; border:none; padding:10px; width:100%; cursor:pointer; font-weight:bold;" onclick="saveStyle()">Save Style</button>
+            <button style="background:#f44; color:white; border:none; padding:10px; width:100%; cursor:pointer; font-weight:bold; margin-top:5px;" id="btnDelStyle" onclick="deleteStyle()">Delete Style</button>
         </div>
     </div>
 
@@ -98,10 +103,10 @@
                 <span style="color:#f44;">✕</span>
             </div>
 
-            <label style="font-size:10px; color:#aaa; font-weight:bold;">Import/Export JSON</label>
-            <div style="display:flex; gap:5px; margin-bottom:15px;">
-                <button class="modal-btn" onclick="exportJSON()" style="flex:1">Export</button>
-                <button class="modal-btn" onclick="document.getElementById('importFile').click()" style="flex:1">Import</button>
+            <label style="font-size:10px; color:#aaa; font-weight:bold;">Backup Data (JSON)</label>
+            <div style="display:flex; gap:5px; margin-bottom:15px; margin-top:5px;">
+                <button onclick="exportJSON()" style="flex:1; padding:8px; background:#444; color:white; border:none; cursor:pointer;">Export</button>
+                <button onclick="document.getElementById('importFile').click()" style="flex:1; padding:8px; background:#444; color:white; border:none; cursor:pointer;">Import</button>
             </div>
             <input type="file" id="importFile" style="display:none" onchange="importJSON(event)">
 
@@ -111,7 +116,8 @@
     </div>
 
     <div class="footer">
-        typer for photopea | v3.1 | Style List Fix
+        typer for photopea ( inspired by <a href="https://typer.hayasaku.fr" target="_blank">typer.hayasaku.fr</a> )
+        <div style="font-size:9px; color:#888; margin-top:2px;">v3.2 | Dropdown Font | Light Footer Fix</div>
     </div>
 
     <script>
@@ -150,7 +156,6 @@
                 const item = document.createElement('div');
                 item.className = `style-item ${activeStyleId == s.id ? 'active' : ''}`;
                 item.onclick = () => { activeStyleId = s.id; renderStyleGrid(); saveData(); };
-                
                 item.innerHTML = `
                     <div class="style-name">${s.name}</div>
                     <span class="edit-icon" onclick="event.stopPropagation(); openEditStyle('${s.id}')">✎</span>
@@ -163,7 +168,6 @@
             document.getElementById('styleModalTitle').innerText = "Add New Style";
             document.getElementById('editStyleId').value = "";
             document.getElementById('sName').value = "New Style";
-            document.getElementById('sFont').value = "CCVictorySpeech-Regular";
             document.getElementById('sSize').value = 50;
             document.getElementById('sPrefix').value = "";
             document.getElementById('btnDelStyle').style.display = "none";
@@ -192,7 +196,6 @@
                 size: parseInt(document.getElementById('sSize').value) || 50,
                 prefixes: document.getElementById('sPrefix').value.split(",").map(x => x.trim()).filter(x => x !== "")
             };
-
             if(id) {
                 const idx = styles.findIndex(x => x.id == id);
                 styles[idx] = newStyle;
@@ -218,10 +221,8 @@
 
             val.split('\n').forEach((line) => {
                 if(!line.trim() || ignoreList.some(tag => line.trim().startsWith(tag))) return;
-
                 let detectedPrefix = "";
                 styles.forEach(s => { s.prefixes.forEach(p => { if(line.trim().startsWith(p)) detectedPrefix = p; }); });
-
                 filteredLines.push(line);
                 let idx = filteredLines.length - 1;
                 const row = document.createElement('div');
@@ -247,7 +248,6 @@
             if(selectedIndex === -1 || !filteredLines[selectedIndex]) return;
             const scale = (parseFloat(document.getElementById('scaleInput').value) || 100) / 100;
             const style = styles.find(s => s.id == activeStyleId) || { font: "Arial", size: 50, prefixes: [] };
-            
             let raw = filteredLines[selectedIndex].trim();
             let prefix = style.prefixes.find(p => raw.startsWith(p)) || "";
             let text = raw.replace(prefix, "").trim();
@@ -278,7 +278,7 @@
             const data = { styles, ignoreTags: document.getElementById('ignoreTags').value };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob); a.download = 'typer_config.json'; a.click();
+            a.href = URL.createObjectURL(blob); a.download = 'typer_v3.json'; a.click();
         }
 
         function importJSON(e) {
@@ -286,17 +286,18 @@
             reader.onload = (event) => {
                 try {
                     const data = JSON.parse(event.target.result);
-                    // Support format file yang kamu upload
-                    if (data.styles) styles = data.styles.map(s => ({
-                        id: s.id || Math.random().toString(),
-                        name: s.name,
-                        font: s.textProps?.layerText?.textStyleRange[0]?.textStyle?.fontName || "Arial",
-                        size: s.textProps?.layerText?.textStyleRange[0]?.textStyle?.size || 50,
-                        prefixes: s.prefixes || []
-                    }));
-                    if (data.ignoreLinePrefixes) document.getElementById('ignoreTags').value = data.ignoreLinePrefixes.join("\n");
+                    if (data.styles) {
+                        styles = data.styles.map(s => ({
+                            id: s.id || Math.random().toString(),
+                            name: s.name,
+                            font: s.font || s.textProps?.layerText?.textStyleRange[0]?.textStyle?.fontName || "Arial",
+                            size: s.size || s.textProps?.layerText?.textStyleRange[0]?.textStyle?.size || 50,
+                            prefixes: s.prefixes || []
+                        }));
+                    }
+                    if (data.ignoreTags) document.getElementById('ignoreTags').value = data.ignoreTags;
                     saveData(); renderStyleGrid(); renderLines(); alert("Import Success!");
-                } catch(err) { alert("Error importing JSON: " + err.message); }
+                } catch(err) { alert("Error importing JSON"); }
             };
             reader.readAsText(e.target.files[0]);
         }
