@@ -6,8 +6,7 @@
         :root { 
             --bg-dark: #282828; --bg-darker: #1a1a1a; --accent: #0078d4;
             --text-light: #eee; --border-dark: #444; --row-hover: #333;
-            --row-active: #094771;
-            --footer-bg: #f5f5f5; --footer-text: #333;
+            --row-active: #094771; --footer-bg: #f5f5f5; --footer-text: #333;
         }
         body { background: var(--bg-dark); color: var(--text-light); font-family: 'Segoe UI', sans-serif; padding: 0; margin: 0; font-size: 11px; user-select: none; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
@@ -24,7 +23,7 @@
         .list-box { flex: 2; overflow-y: auto; background: #222; border-bottom: 2px solid #444; }
         
         .style-grid { flex: 1.5; overflow-y: auto; background: #333; padding: 5px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; align-content: start; }
-        .style-item { display: flex; align-items: center; background: #444; padding: 6px; border-radius: 2px; cursor: pointer; border: 1px solid #555; }
+        .style-item { display: flex; align-items: center; background: #444; padding: 6px; border-radius: 2px; cursor: pointer; border: 1px solid #555; height: fit-content; }
         .style-item.active { background: var(--row-active); border-color: var(--accent); }
         .style-name { flex: 1; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .edit-icon { color: #aaa; cursor: pointer; padding: 2px 5px; font-size: 12px; }
@@ -36,9 +35,10 @@
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 200; padding: 20px; box-sizing: border-box; }
         .modal-content { background: #333; padding: 15px; border-radius: 4px; border: 1px solid #555; max-height: 95%; overflow-y: auto; color: #fff; }
         .modal-input, .modal-select { background: #1a1a1a; color: #fff; border: 1px solid #555; padding: 8px; width: 100%; box-sizing: border-box; margin-top: 5px; border-radius: 2px; margin-bottom: 10px; font-size: 12px; }
+        .btn-copy-layer { background: #555; color: #eee; border: 1px solid #666; padding: 8px; width: 100%; cursor: pointer; border-radius: 2px; margin-bottom: 15px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-copy-layer:hover { background: #666; }
 
         .footer { background: var(--footer-bg); padding: 8px; font-size: 10px; color: var(--footer-text); border-top: 1px solid #ccc; text-align: center; font-weight: 500; }
-        .footer a { color: var(--accent); text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body onkeydown="handleGlobalKeys(event)">
@@ -66,12 +66,18 @@
                 <strong id="styleModalTitle">Style Settings</strong>
                 <button onclick="toggleModal('styleModal')" style="color:#f44; border:none; background:none; cursor:pointer; font-weight:bold;">✕</button>
             </div>
+            
+            <button class="btn-copy-layer" onclick="askPhotopeaForStyle()">
+                <span>📄</span> Copy layer style
+            </button>
+            <div style="font-size:9px; color:#aaa; margin-top:-10px; margin-bottom:15px; font-style:italic;">Copy font & size from the active text layer in Photopea</div>
+
             <input type="hidden" id="editStyleId">
             <label>Style Name</label>
             <input type="text" id="sName" class="modal-input">
             
-            <label>Font Name (Copy persis dari Photopea)</label>
-            <input type="text" id="sFont" class="modal-input" placeholder="Contoh: 2Dumb">
+            <label>Font PostScript Name</label>
+            <input type="text" id="sFont" class="modal-input" placeholder="e.g. CCVictorySpeech-Regular">
             
             <label>Appearance Style</label>
             <select id="sWeight" class="modal-select">
@@ -83,8 +89,9 @@
 
             <label>Base Size (px)</label>
             <input type="number" id="sSize" class="modal-input">
-            <label>Prefixes (Pisahkan dengan koma)</label>
+            <label>Prefixes (comma separated)</label>
             <input type="text" id="sPrefix" class="modal-input">
+            
             <button style="background:var(--accent); color:white; border:none; padding:10px; width:100%; cursor:pointer; font-weight:bold;" onclick="saveStyle()">Save Style</button>
             <button style="background:#f44; color:white; border:none; padding:10px; width:100%; cursor:pointer; font-weight:bold; margin-top:5px;" id="btnDelStyle" onclick="deleteStyle()">Delete Style</button>
         </div>
@@ -107,13 +114,12 @@
             <input type="file" id="importFile" style="display:none" onchange="importJSON(event)">
             <label style="font-size:10px; color:#aaa; font-weight:bold;">Tags to Ignore</label>
             <textarea id="ignoreTags" class="modal-input" style="height:100px;" oninput="saveSettings()"></textarea>
-            <button onclick="if(confirm('Reset semua data?')){localStorage.clear(); location.reload();}" style="background:#f44; color:white; border:none; padding:5px; width:100%; cursor:pointer; font-size:9px; margin-top:10px;">RESET ALL DATA</button>
+            <button onclick="if(confirm('Reset all data?')){localStorage.clear(); location.reload();}" style="background:#f44; color:white; border:none; padding:5px; width:100%; cursor:pointer; font-size:9px; margin-top:10px;">RESET ALL DATA</button>
         </div>
     </div>
 
     <div class="footer">
-        typer for photopea ( inspired by <a href="https://typer.hayasaku.fr" target="_blank">typer.hayasaku.fr</a> )
-        <div style="font-size:9px; color:#888; margin-top:2px;">v3.7 | Font Fallback Prevention | Light Footer</div>
+        typer for photopea | v3.8 | Copy Layer Style System | Light Footer
     </div>
 
     <script>
@@ -122,6 +128,27 @@
         let filteredLines = [];
         let styles = [];
         const DEFAULT_TAGS = "SFX:\nSfx:\nsfx:\nSFX\nSfx\nsfx\n##\nHalaman\nPage\n---\npage\n===\nP1\nP2\n[1]\nPg.\nPAGE\n=0\n--";
+
+        window.addEventListener("message", function(e) {
+            if (e.data && typeof e.data === "string" && e.data.startsWith("LAYER_STYLE|")) {
+                const parts = e.data.split("|");
+                document.getElementById('sFont').value = parts[1];
+                document.getElementById('sSize').value = Math.round(parseFloat(parts[2]));
+            }
+        });
+
+        function askPhotopeaForStyle() {
+            const script = `
+                var ly = app.activeDocument.activeLayer;
+                if(ly.kind == LayerKind.TEXT) {
+                    var ti = ly.textItem;
+                    window.parent.postMessage("LAYER_STYLE|" + ti.font + "|" + ti.size, "*");
+                } else {
+                    alert("Please select a TEXT layer first!");
+                }
+            `;
+            window.parent.postMessage(script, "*");
+        }
 
         function handleGlobalKeys(e) {
             if (e.ctrlKey && (e.metaKey || e.key === "Meta" || e.code.includes("Meta"))) {
@@ -263,25 +290,7 @@
                 var ti = layer.textItem;
                 ti.contents = "${s.trim().replace(/"/g, '\\"')}";
                 
-                // Smart Font Finder: Mencari font yang paling mirip namanya
-                var target = "${style.font}".toLowerCase().replace(/\\s/g, "");
-                var foundFont = null;
-                for(var i=0; i<app.fonts.length; i++) {
-                    var f = app.fonts[i];
-                    var fName = f.name.toLowerCase().replace(/\\s/g, "");
-                    var pName = f.postScriptName.toLowerCase().replace(/\\s/g, "");
-                    if(fName == target || pName == target) {
-                        foundFont = f.postScriptName; break;
-                    }
-                }
-
-                if(foundFont) { 
-                    ti.font = foundFont; 
-                } else {
-                    // Jika tidak ketemu, coba paksa nama yang diinput user
-                    try { ti.font = "${style.font}"; } catch(e) {}
-                }
-                
+                try { ti.font = "${style.font}"; } catch(e) {}
                 ti.size = ${style.size * scale};
                 ti.justification = Justification.CENTER;
 
@@ -297,10 +306,10 @@
         }
 
         function exportJSON() {
-            const data = { styles, ignoreTags: document.getElementById('ignoreTags').value };
+            const data = { styles, ignoreLinePrefixes: document.getElementById('ignoreTags').value.split('\n') };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob); a.download = 'typer_styles.json'; a.click();
+            a.href = URL.createObjectURL(blob); a.download = 'typer_v3.8.json'; a.click();
         }
 
         function importJSON(e) {
@@ -318,7 +327,7 @@
                             prefixes: s.prefixes || []
                         }));
                     }
-                    if (data.ignoreTags) document.getElementById('ignoreTags').value = data.ignoreTags;
+                    if (data.ignoreLinePrefixes) document.getElementById('ignoreTags').value = data.ignoreLinePrefixes.join("\n");
                     saveData(); renderStyleGrid(); renderLines(); alert("Import Success!");
                 } catch(err) { alert("Error importing JSON"); }
             };
