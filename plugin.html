@@ -7,12 +7,10 @@
             --bg-dark: #282828; --bg-darker: #1a1a1a; --accent: #0078d4;
             --text-light: #eee; --border-dark: #444; --row-hover: #333;
             --row-active: #094771;
-            /* Tema Terang untuk Footer */
             --footer-bg: #f5f5f5; --footer-text: #333;
         }
         body { background: var(--bg-dark); color: var(--text-light); font-family: 'Segoe UI', sans-serif; padding: 0; margin: 0; font-size: 11px; user-select: none; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
-        /* Header & Scale Controls */
         .top-nav { display: flex; gap: 4px; padding: 5px; background: #333; border-bottom: 1px solid var(--border-dark); align-items: center; }
         .btn-main { background: var(--accent); color: white; border: none; padding: 8px; flex: 1; cursor: pointer; font-weight: bold; border-radius: 2px; }
         
@@ -22,19 +20,16 @@
 
         textarea { width: 100%; height: 80px; background: var(--bg-darker); color: #fff; border: none; border-bottom: 1px solid var(--border-dark); padding: 8px; box-sizing: border-box; resize: none; font-family: 'Consolas', monospace; outline: none; }
         
-        /* List Area */
         .list-box { flex: 1; overflow-y: auto; background: #222; }
         .row { display: flex; align-items: center; border-bottom: 1px solid #333; padding: 8px 12px; cursor: pointer; }
         .row.active { background: var(--row-active); border-left: 3px solid var(--accent); }
         .num { color: #666; width: 30px; font-size: 10px; }
         .tag { color: #ffca28; margin-right: 8px; font-weight: bold; }
 
-        /* Settings Modal */
         #settingsModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 100; padding: 15px; box-sizing: border-box; }
         .modal-content { background: #333; padding: 15px; border-radius: 4px; border: 1px solid #555; max-height: 95%; overflow-y: auto; color: #fff; }
         .modal-input { background: #1a1a1a; color: #fff; border: 1px solid #555; padding: 8px; width: 100%; box-sizing: border-box; margin-top: 5px; border-radius: 2px; }
 
-        /* Footer Terang Sesuai Permintaan */
         .footer { background: var(--footer-bg); padding: 8px; font-size: 10px; color: var(--footer-text); border-top: 1px solid #ccc; text-align: center; font-weight: 500; }
         .footer a { color: var(--accent); text-decoration: none; font-weight: bold; }
     </style>
@@ -66,7 +61,7 @@
 
     <div class="footer">
         typer for photopea ( inspired by <a href="https://typer.hayasaku.fr" target="_blank">typer.hayasaku.fr</a> )
-        <div style="font-size:9px; color:#888; margin-top:2px;">v2.2 | Shortcut: WIN+CTRL | Light Footer</div>
+        <div style="font-size:9px; color:#888; margin-top:2px;">v2.3 | Shortcut: WIN + CTRL | Light Footer</div>
     </div>
 
     <script>
@@ -74,11 +69,12 @@
         let filteredLines = [];
         const DEFAULT_TAGS = "SFX:\nSfx:\nsfx:\nSFX\nSfx\nsfx\n##\nHalaman\nPage\n---\npage\n===\nP1\nP2\n[1]\nPg.\nPAGE\n=0\n--";
 
+        // Perbaikan deteksi shortcut keyboard
         function handleGlobalKeys(e) {
-            // Shortcut WIN + CTRL untuk Paste (Meta = Win Key)
-            if (e.metaKey && e.ctrlKey) { 
-                e.preventDefault(); 
-                sendText(); 
+            // Deteksi CTRL + META (Tombol Windows)
+            if (e.ctrlKey && (e.metaKey || e.key === "Meta" || e.code === "MetaLeft" || e.code === "MetaRight")) {
+                e.preventDefault();
+                sendText();
             }
         }
 
@@ -138,7 +134,6 @@
             let match = line.match(/^([A-Z()]+):(.*)/);
             let text = match ? match[2].trim() : line.trim();
 
-            // Auto-Shaping 3 words
             let w = text.split(' '), s = "";
             for (let i = 0; i < w.length; i++) {
                 s += w[i] + " ";
