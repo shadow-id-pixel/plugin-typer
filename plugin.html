@@ -48,13 +48,13 @@
         <button class="btn-main" onclick="sendText()">+ Paste & Next</button>
         <div class="scale-section">
             <span class="scale-label">scale:</span>
-            <input type="number" id="scaleInput" class="scale-input" value="100">
+            <input type="number" id="scaleInput" class="scale-input" value="100" oninput="saveData()">
             <span style="color:#ccc;">%</span>
         </div>
         <button onclick="toggleSettings()" style="background:#444; border:none; color:white; padding:8px 12px; cursor:pointer; border-radius:2px;">⚙</button>
     </div>
 
-    <textarea id="input" oninput="renderLines()" placeholder="Paste script manhwa di sini..."></textarea>
+    <textarea id="input" oninput="handleInput()" placeholder="Paste script manhwa di sini..."></textarea>
     <div class="list-box" id="list"></div>
 
     <div id="settingsModal">
@@ -83,7 +83,7 @@
 
     <div class="footer">
         typer for photopea ( inspired by <a href="https://typer.hayasaku.fr" target="_blank">typer.hayasaku.fr</a> )
-        <div style="font-size:9px; color:#888; margin-top:2px;">v2.7 | Shortcut Instructions Update | Light Footer</div>
+        <div style="font-size:9px; color:#888; margin-top:2px;">v2.8 | Auto-Save Persistent Build | Light Footer</div>
     </div>
 
     <script>
@@ -101,6 +101,17 @@
         function toggleSettings() {
             const m = document.getElementById('settingsModal');
             m.style.display = (m.style.display === 'block') ? 'none' : 'block';
+        }
+
+        function handleInput() {
+            saveData();
+            renderLines();
+        }
+
+        function saveData() {
+            localStorage.setItem('typer_main_text', document.getElementById('input').value);
+            localStorage.setItem('typer_scale', document.getElementById('scaleInput').value);
+            localStorage.setItem('typer_last_index', selectedIndex);
         }
 
         function saveSettings() {
@@ -145,6 +156,7 @@
                 activeRow.classList.add('active');
                 activeRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
+            saveData();
         }
 
         function sendText() {
@@ -180,9 +192,25 @@
         }
 
         window.onload = () => {
-            let saved = localStorage.getItem('ignoreTags');
-            document.getElementById('ignoreTags').value = (saved === null) ? DEFAULT_TAGS : saved;
+            // Load Settings
+            let savedTags = localStorage.getItem('ignoreTags');
+            document.getElementById('ignoreTags').value = (savedTags === null) ? DEFAULT_TAGS : savedTags;
+            
+            // Load Main Text
+            let savedText = localStorage.getItem('typer_main_text');
+            if (savedText !== null) document.getElementById('input').value = savedText;
+            
+            // Load Scale
+            let savedScale = localStorage.getItem('typer_scale');
+            if (savedScale !== null) document.getElementById('scaleInput').value = savedScale;
+
             renderLines();
+
+            // Load Last Selected Index
+            let lastIdx = localStorage.getItem('typer_last_index');
+            if (lastIdx !== null && lastIdx !== "-1") {
+                selectRow(parseInt(lastIdx));
+            }
         }
     </script>
 </body>
