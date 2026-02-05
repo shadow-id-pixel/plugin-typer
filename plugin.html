@@ -11,9 +11,6 @@
         }
         body { background: var(--bg-dark); color: var(--text-light); font-family: 'Segoe UI', sans-serif; padding: 0; margin: 0; font-size: 11px; user-select: none; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
-        /* Hidden focus catcher */
-        #focusCatcher { position: absolute; left: -9999px; top: 0; opacity: 0; }
-
         .top-nav { display: flex; gap: 4px; padding: 5px; background: #333; border-bottom: 1px solid var(--border-dark); align-items: center; }
         .btn-main { background: var(--accent); color: white; border: none; padding: 8px; flex: 1; cursor: pointer; font-weight: bold; border-radius: 2px; }
         
@@ -37,8 +34,6 @@
     </style>
 </head>
 <body onkeydown="handleGlobalKeys(event)">
-    <input type="text" id="focusCatcher">
-
     <div class="top-nav">
         <button class="btn-main" onclick="sendText()">+ Paste & Next</button>
         <div class="scale-section">
@@ -50,7 +45,7 @@
     </div>
 
     <textarea id="input" oninput="renderLines()" placeholder="Paste script manhwa di sini..."></textarea>
-    <div class="list-box" id="list"></div>
+    <div class="list-box" id="list" onclick="this.focus()"></div>
 
     <div id="settingsModal">
         <div class="modal-content">
@@ -72,7 +67,7 @@
 
     <div class="footer">
         typer for photopea ( inspired by <a href="https://typer.hayasaku.fr" target="_blank">typer.hayasaku.fr</a> )
-        <div style="font-size:9px; color:#888; margin-top:2px;">v2.5 | Force Focus Shortcut Build</div>
+        <div style="font-size:9px; color:#888; margin-top:2px;">v2.6 | Stable Focus Build | Light Footer</div>
     </div>
 
     <script>
@@ -80,13 +75,7 @@
         let filteredLines = [];
         const DEFAULT_TAGS = "SFX:\nSfx:\nsfx:\nSFX\nSfx\nsfx\n##\nHalaman\nPage\n---\npage\n===\nP1\nP2\n[1]\nPg.\nPAGE\n=0\n--";
 
-        function forceFocus() {
-            // Memaksa input tersembunyi untuk mengambil fokus
-            document.getElementById('focusCatcher').focus();
-        }
-
         function handleGlobalKeys(e) {
-            // Deteksi WIN (Meta) + CTRL
             if (e.ctrlKey && (e.metaKey || e.key === "Meta" || e.code.includes("Meta"))) {
                 e.preventDefault();
                 sendText();
@@ -140,7 +129,7 @@
                 activeRow.classList.add('active');
                 activeRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
-            forceFocus();
+            window.focus();
         }
 
         function sendText() {
@@ -170,10 +159,8 @@
             `;
             window.parent.postMessage(ppea, "*");
             
-            // Otomatis pindah baris & tarik fokus kembali
             setTimeout(() => {
                 selectRow(selectedIndex + 1);
-                forceFocus();
             }, 50); 
         }
 
@@ -181,7 +168,6 @@
             let saved = localStorage.getItem('ignoreTags');
             document.getElementById('ignoreTags').value = (saved === null) ? DEFAULT_TAGS : saved;
             renderLines();
-            forceFocus();
         }
     </script>
 </body>
