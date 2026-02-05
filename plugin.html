@@ -70,15 +70,15 @@
             <label>Style Name</label>
             <input type="text" id="sName" class="modal-input">
             
-            <label>Font Family (Nama Font di Photopea)</label>
-            <input type="text" id="sFont" class="modal-input" placeholder="e.g. 2Dumb">
+            <label>Font Name (Copy persis dari Photopea)</label>
+            <input type="text" id="sFont" class="modal-input" placeholder="Contoh: 2Dumb">
             
-            <label>Style (Forced Bold/Italic)</label>
+            <label>Appearance Style</label>
             <select id="sWeight" class="modal-select">
                 <option value="Regular">Regular</option>
-                <option value="Bold">Force Bold</option>
-                <option value="Italic">Force Italic</option>
-                <option value="Bold Italic">Force Bold Italic</option>
+                <option value="Bold">Forced Bold</option>
+                <option value="Italic">Forced Italic</option>
+                <option value="Bold Italic">Forced Bold Italic</option>
             </select>
 
             <label>Base Size (px)</label>
@@ -105,14 +105,15 @@
                 <button onclick="document.getElementById('importFile').click()" style="flex:1; padding:8px; background:#444; color:white; border:none; cursor:pointer;">Import JSON</button>
             </div>
             <input type="file" id="importFile" style="display:none" onchange="importJSON(event)">
-            <label style="font-size:10px; color:#aaa; font-weight:bold;">Tags for ignoring the lines</label>
+            <label style="font-size:10px; color:#aaa; font-weight:bold;">Tags to Ignore</label>
             <textarea id="ignoreTags" class="modal-input" style="height:100px;" oninput="saveSettings()"></textarea>
             <button onclick="if(confirm('Reset semua data?')){localStorage.clear(); location.reload();}" style="background:#f44; color:white; border:none; padding:5px; width:100%; cursor:pointer; font-size:9px; margin-top:10px;">RESET ALL DATA</button>
         </div>
     </div>
 
     <div class="footer">
-        typer for photopea | v3.6 | Fast Font Load & Faux Style Support
+        typer for photopea ( inspired by <a href="https://typer.hayasaku.fr" target="_blank">typer.hayasaku.fr</a> )
+        <div style="font-size:9px; color:#888; margin-top:2px;">v3.7 | Font Fallback Prevention | Light Footer</div>
     </div>
 
     <script>
@@ -262,15 +263,28 @@
                 var ti = layer.textItem;
                 ti.contents = "${s.trim().replace(/"/g, '\\"')}";
                 
-                // Cepat set font tanpa scanning lambat
-                try {
-                    ti.font = "${style.font}";
-                } catch(e) {}
+                // Smart Font Finder: Mencari font yang paling mirip namanya
+                var target = "${style.font}".toLowerCase().replace(/\\s/g, "");
+                var foundFont = null;
+                for(var i=0; i<app.fonts.length; i++) {
+                    var f = app.fonts[i];
+                    var fName = f.name.toLowerCase().replace(/\\s/g, "");
+                    var pName = f.postScriptName.toLowerCase().replace(/\\s/g, "");
+                    if(fName == target || pName == target) {
+                        foundFont = f.postScriptName; break;
+                    }
+                }
+
+                if(foundFont) { 
+                    ti.font = foundFont; 
+                } else {
+                    // Jika tidak ketemu, coba paksa nama yang diinput user
+                    try { ti.font = "${style.font}"; } catch(e) {}
+                }
                 
                 ti.size = ${style.size * scale};
                 ti.justification = Justification.CENTER;
 
-                // Forced Bold/Italic (Faux) jika font asli tidak ada variannya
                 var weight = "${style.weight}";
                 if(weight.indexOf("Bold") != -1) { try { ti.fauxBold = true; } catch(e) {} }
                 if(weight.indexOf("Italic") != -1) { try { ti.fauxItalic = true; } catch(e) {} }
@@ -286,7 +300,7 @@
             const data = { styles, ignoreTags: document.getElementById('ignoreTags').value };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob); a.download = 'typer_v3.6.json'; a.click();
+            a.href = URL.createObjectURL(blob); a.download = 'typer_styles.json'; a.click();
         }
 
         function importJSON(e) {
