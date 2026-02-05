@@ -7,7 +7,6 @@
             --bg-dark: #282828; --bg-darker: #1a1a1a; --accent: #0078d4;
             --text-light: #eee; --border-dark: #444; --row-hover: #333;
             --row-active: #094771;
-            /* Footer Terang Sesuai Permintaan */
             --footer-bg: #f5f5f5; --footer-text: #333;
         }
         body { background: var(--bg-dark); color: var(--text-light); font-family: 'Segoe UI', sans-serif; padding: 0; margin: 0; font-size: 11px; user-select: none; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
@@ -24,8 +23,8 @@
         .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         .list-box { flex: 2; overflow-y: auto; background: #222; border-bottom: 2px solid #444; }
         
-        .style-grid { flex: 1.5; overflow-y: auto; background: #333; padding: 5px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
-        .style-item { display: flex; align-items: center; background: #444; padding: 6px; border-radius: 2px; cursor: pointer; border: 1px solid #555; }
+        .style-grid { flex: 1.5; overflow-y: auto; background: #333; padding: 5px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; align-content: start; }
+        .style-item { display: flex; align-items: center; background: #444; padding: 6px; border-radius: 2px; cursor: pointer; border: 1px solid #555; height: fit-content; }
         .style-item.active { background: var(--row-active); border-color: var(--accent); }
         .style-name { flex: 1; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .edit-icon { color: #aaa; cursor: pointer; padding: 2px 5px; font-size: 12px; }
@@ -36,7 +35,7 @@
 
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 200; padding: 20px; box-sizing: border-box; }
         .modal-content { background: #333; padding: 15px; border-radius: 4px; border: 1px solid #555; max-height: 95%; overflow-y: auto; color: #fff; }
-        .modal-input, .modal-select { background: #1a1a1a; color: #fff; border: 1px solid #555; padding: 8px; width: 100%; box-sizing: border-box; margin-top: 5px; border-radius: 2px; margin-bottom: 10px; font-size: 12px; }
+        .modal-input { background: #1a1a1a; color: #fff; border: 1px solid #555; padding: 8px; width: 100%; box-sizing: border-box; margin-top: 5px; border-radius: 2px; margin-bottom: 10px; font-size: 12px; }
 
         .footer { background: var(--footer-bg); padding: 8px; font-size: 10px; color: var(--footer-text); border-top: 1px solid #ccc; text-align: center; font-weight: 500; }
         .footer a { color: var(--accent); text-decoration: none; font-weight: bold; }
@@ -69,21 +68,14 @@
             </div>
             <input type="hidden" id="editStyleId">
             <label>Style Name</label>
-            <input type="text" id="sName" class="modal-input">
+            <input type="text" id="sName" class="modal-input" placeholder="e.g. Normal Speech">
             
-            <label>Font Family</label>
-            <select id="sFont" class="modal-select">
-                <option value="CCVictorySpeech-Regular">CCVictorySpeech-Regular</option>
-                <option value="CCVictorySpeech-Italic">CCVictorySpeech-Italic</option>
-                <option value="WildWords-Regular">WildWords-Regular</option>
-                <option value="AnimeAce2.0BB-Regular">AnimeAce2.0BB-Regular</option>
-                <option value="Arial">Arial</option>
-            </select>
-            <div style="font-size:9px; color:#aaa; margin-top:-5px; margin-bottom:10px;">*Pastikan font sudah ter-load di Photopea</div>
+            <label>Font Family (Ketik Nama Font Sesuai di Photopea)</label>
+            <input type="text" id="sFont" class="modal-input" placeholder="e.g. CCVictorySpeech-Regular">
 
             <label>Base Size (px)</label>
-            <input type="number" id="sSize" class="modal-input">
-            <label>Prefixes (comma separated)</label>
+            <input type="number" id="sSize" class="modal-input" value="50">
+            <label>Prefixes (Pisahkan dengan koma)</label>
             <input type="text" id="sPrefix" class="modal-input" placeholder='"": , ():'>
             <button style="background:var(--accent); color:white; border:none; padding:10px; width:100%; cursor:pointer; font-weight:bold;" onclick="saveStyle()">Save Style</button>
             <button style="background:#f44; color:white; border:none; padding:10px; width:100%; cursor:pointer; font-weight:bold; margin-top:5px;" id="btnDelStyle" onclick="deleteStyle()">Delete Style</button>
@@ -97,13 +89,13 @@
                 <button onclick="toggleModal('settingsModal')" style="color:#f44; border:none; background:none; cursor:pointer; font-weight:bold;">✕</button>
             </div>
             
-            <label style="font-size:10px; color:#aaa; font-weight:bold;">Shortcut</label>
+            <label style="font-size:10px; color:#aaa; font-weight:bold;">Shortcut Info</label>
             <div style="background:#222; padding:8px; margin:5px 0 15px; border:1px solid #444; display:flex; justify-content:space-between; align-items:center;">
                 <span>WIN + CTRL <small style="color:#ffca28; margin-left:5px;">(click line first)</small></span>
                 <span style="color:#f44;">✕</span>
             </div>
 
-            <label style="font-size:10px; color:#aaa; font-weight:bold;">Backup Data (JSON)</label>
+            <label style="font-size:10px; color:#aaa; font-weight:bold;">Import/Export JSON</label>
             <div style="display:flex; gap:5px; margin-bottom:15px; margin-top:5px;">
                 <button onclick="exportJSON()" style="flex:1; padding:8px; background:#444; color:white; border:none; cursor:pointer;">Export</button>
                 <button onclick="document.getElementById('importFile').click()" style="flex:1; padding:8px; background:#444; color:white; border:none; cursor:pointer;">Import</button>
@@ -112,12 +104,13 @@
 
             <label style="font-size:10px; color:#aaa; font-weight:bold;">Tags for ignoring the lines</label>
             <textarea id="ignoreTags" class="modal-input" style="height:100px;" oninput="saveSettings()"></textarea>
+            <button onclick="localStorage.clear(); location.reload();" style="background:#f44; color:white; border:none; padding:5px; width:100%; cursor:pointer; font-size:9px; margin-top:10px;">RESET ALL DATA</button>
         </div>
     </div>
 
     <div class="footer">
         typer for photopea ( inspired by <a href="https://typer.hayasaku.fr" target="_blank">typer.hayasaku.fr</a> )
-        <div style="font-size:9px; color:#888; margin-top:2px;">v3.2 | Dropdown Font | Light Footer Fix</div>
+        <div style="font-size:9px; color:#888; margin-top:2px;">v3.3 | Empty Style Default | Manual Font Input</div>
     </div>
 
     <script>
@@ -167,7 +160,8 @@
         function openAddStyle() {
             document.getElementById('styleModalTitle').innerText = "Add New Style";
             document.getElementById('editStyleId').value = "";
-            document.getElementById('sName').value = "New Style";
+            document.getElementById('sName').value = "";
+            document.getElementById('sFont').value = "";
             document.getElementById('sSize').value = 50;
             document.getElementById('sPrefix').value = "";
             document.getElementById('btnDelStyle').style.display = "none";
@@ -191,8 +185,8 @@
             const id = document.getElementById('editStyleId').value;
             const newStyle = {
                 id: id || Date.now().toString(),
-                name: document.getElementById('sName').value,
-                font: document.getElementById('sFont').value,
+                name: document.getElementById('sName').value || "Unnamed Style",
+                font: document.getElementById('sFont').value || "Arial",
                 size: parseInt(document.getElementById('sSize').value) || 50,
                 prefixes: document.getElementById('sPrefix').value.split(",").map(x => x.trim()).filter(x => x !== "")
             };
@@ -275,10 +269,10 @@
         }
 
         function exportJSON() {
-            const data = { styles, ignoreTags: document.getElementById('ignoreTags').value };
+            const data = { styles, ignoreLinePrefixes: document.getElementById('ignoreTags').value.split('\n') };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob); a.download = 'typer_v3.json'; a.click();
+            a.href = URL.createObjectURL(blob); a.download = 'typer_style_custom.json'; a.click();
         }
 
         function importJSON(e) {
@@ -295,7 +289,7 @@
                             prefixes: s.prefixes || []
                         }));
                     }
-                    if (data.ignoreTags) document.getElementById('ignoreTags').value = data.ignoreTags;
+                    if (data.ignoreLinePrefixes) document.getElementById('ignoreTags').value = data.ignoreLinePrefixes.join("\n");
                     saveData(); renderStyleGrid(); renderLines(); alert("Import Success!");
                 } catch(err) { alert("Error importing JSON"); }
             };
