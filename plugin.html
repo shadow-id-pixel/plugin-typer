@@ -53,7 +53,7 @@
         <button onclick="toggleModal('settingsModal')" style="background:#444; border:none; color:white; padding:8px; cursor:pointer; border-radius:2px;">⚙</button>
     </div>
 
-    <textarea id="input" oninput="handleInput()" placeholder="Paste script manhwa di sini..."></textarea>
+    <textarea id="input" oninput="handleInput()" placeholder="Paste manhwa script here..."></textarea>
     
     <div class="main-content">
         <div class="list-box" id="list"></div>
@@ -70,10 +70,10 @@
             <input type="hidden" id="editStyleId">
             
             <span class="modal-label">Style Name</span>
-            <input type="text" id="sName" class="modal-input" placeholder="Misal: Narasi">
+            <input type="text" id="sName" class="modal-input" placeholder="e.g., Narrative">
             
             <span class="modal-label">Font Family</span>
-            <input list="fontOptions" id="sFont" class="modal-input" placeholder="Pilih atau ketik nama font...">
+            <input list="fontOptions" id="sFont" class="modal-input" placeholder="Select or type font name...">
             <datalist id="fontOptions">
                 <option value="CCScoundrel-Regular">CC Scoundrel</option>
                 <option value="CCTallTales-Regular">CC Tall Tales</option>
@@ -94,16 +94,16 @@
                 <option value="Bold Italic">Forced Bold Italic</option>
             </select>
 
-            <span class="modal-label">Case (Huruf Kapital)</span>
+            <span class="modal-label">Case (Capitalization)</span>
             <select id="sCase" class="modal-select">
-                <option value="none">Normal (Sesuai ketikan)</option>
-                <option value="uppercase">ALL CAPS (KAPITAL SEMUA)</option>
+                <option value="none">Normal (As typed)</option>
+                <option value="uppercase">ALL CAPS</option>
             </select>
 
             <span class="modal-label">Base Size (px)</span>
             <input type="number" id="sSize" class="modal-input" value="50">
 
-            <span class="modal-label">Prefixes (Pisahkan dengan koma)</span>
+            <span class="modal-label">Prefixes (Separate with commas)</span>
             <input type="text" id="sPrefix" class="modal-input" placeholder='"": , ():'>
             
             <div style="margin-top:20px; display:flex; flex-direction:column; gap:8px;">
@@ -121,7 +121,7 @@
             </div>
             <div style="background:#222; padding:10px; margin-bottom:15px; border:1px solid #444; border-radius:2px; font-size:10px;">
                 <span style="color:#aaa;">Shortcut:</span><br>
-                <strong style="color:#fff;">WIN + CTRL</strong> <small style="color:#ffca28;">(Klik baris dulu agar aktif)</small>
+                <strong style="color:#fff;">WIN + CTRL</strong> <small style="color:#ffca28;">(Click a line first to activate)</small>
             </div>
             <div style="display:flex; gap:5px; margin-bottom:15px;">
                 <button onclick="exportJSON()" style="flex:1; padding:10px; background:#444; color:white; border:none; cursor:pointer; border-radius:2px;">Export JSON</button>
@@ -130,7 +130,7 @@
             <input type="file" id="importFile" style="display:none" onchange="importJSON(event)">
             <label class="modal-label">Tags to Ignore</label>
             <textarea id="ignoreTags" class="modal-input" style="height:100px;" oninput="saveSettings()"></textarea>
-            <button onclick="if(confirm('Hapus semua data plugin?')){localStorage.clear(); location.reload();}" style="background:#f44; color:white; border:none; padding:8px; width:100%; cursor:pointer; font-size:10px; margin-top:15px; border-radius:2px;">RESET ALL DATA</button>
+            <button onclick="if(confirm('Delete all plugin data?')){localStorage.clear(); location.reload();}" style="background:#f44; color:white; border:none; padding:8px; width:100%; cursor:pointer; font-size:10px; margin-top:15px; border-radius:2px;">RESET ALL DATA</button>
         </div>
     </div>
 
